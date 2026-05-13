@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCTV Monitoring Login</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#0f172a;
+      overflow:hidden;
+      color:white;
+    }
+
+    /* LOGIN */
+    .container{
+      width:100%;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:
+      linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.8)),
+      url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop');
+      background-size:cover;
+      background-position:center;
+    }
+
+    .box{
+      width:360px;
+      background:rgba(15,23,42,0.92);
+      padding:40px;
+      border-radius:20px;
+      backdrop-filter:blur(10px);
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
+      animation:fadeIn 1s ease;
+    }
+
+    .box h2{
+      text-align:center;
+      margin-bottom:30px;
+      color:#38bdf8;
+    }
+
+    .input-box{
+      margin-bottom:20px;
+    }
+
+    .input-box label{
+      display:block;
+      margin-bottom:8px;
+      color:#cbd5e1;
+    }
+
+    .input-box input{
+      width:100%;
+      padding:14px;
+      border:none;
+      outline:none;
+      border-radius:10px;
+      background:#1e293b;
+      color:white;
+    }
+
+    .btn{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      background:#38bdf8;
+      color:white;
+      cursor:pointer;
+      font-size:16px;
+      transition:0.3s;
+    }
+
+    .btn:hover{
+      background:#0ea5e9;
+      transform:scale(1.03);
+    }
+
+    .forgot{
+      text-align:right;
+      margin-top:10px;
+    }
+
+    .forgot a{
+      color:#38bdf8;
+      text-decoration:none;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    .forgot a:hover{
+      text-decoration:underline;
+    }
+
+    .message{
+      margin-top:15px;
+      text-align:center;
+      font-size:14px;
+      display:none;
+    }
+
+    .error{
+      color:#ef4444;
+    }
+
+    .success{
+      color:#22c55e;
+    }
+
+    /* POPUP */
+    .popup{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.7);
+      display:none;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .popup-box{
+      width:350px;
+      background:#111827;
+      padding:30px;
+      border-radius:20px;
+      animation:fadeIn 0.5s ease;
+    }
+
+    .popup-box h3{
+      margin-bottom:20px;
+      color:#38bdf8;
+      text-align:center;
+    }
+
+    .close{
+      margin-top:15px;
+      background:#ef4444;
+    }
+
+    /* DASHBOARD */
+    .dashboard{
+      display:none;
+      width:100%;
+      height:100vh;
+      background:#0f172a;
+    }
+
+    .header{
+      height:70px;
+      background:#111827;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 25px;
+      border-bottom:2px solid #1e293b;
+    }
+
+    .header h1{
+      color:#38bdf8;
+    }
+
+    .logout{
+      background:#ef4444;
+      border:none;
+      padding:10px 15px;
+      color:white;
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+    .cams{
+      padding:20px;
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:20px;
+      height:calc(100vh - 70px);
+    }
+
+    .cam{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      border:2px solid #1e293b;
+      background:#111827;
+    }
+
+    .cam img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter:brightness(0.8);
+    }
+
+    .cam-info{
+      position:absolute;
+      top:15px;
+      left:15px;
+      background:rgba(0,0,0,0.5);
+      padding:8px 12px;
+      border-radius:10px;
+    }
+
+    .rec{
+      color:red;
+      animation:blink 1s infinite;
+    }
+
+    .time{
+      position:absolute;
+      bottom:15px;
+      right:15px;
+      background:rgba(0,0,0,0.5);
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:13px;
+    }
+
+    @keyframes blink{
+      50%{
+        opacity:0.4;
+      }
+    }
+
+    @keyframes fadeIn{
+      from{
+        opacity:0;
+        transform:translateY(20px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    @media(max-width:900px){
+      .cams{
+        grid-template-columns:1fr;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div class="container" id="loginPage">
+
+    <div class="box">
+
+      <h2>🔒 CCTV LOGIN</h2>
+
+      <div class="input-box">
+        <label>ID USER</label>
+        <input type="text" id="username" placeholder="Masukkan ID">
+      </div>
+
+      <div class="input-box">
+        <label>PASSWORD</label>
+        <input type="password" id="password" placeholder="Masukkan Password">
+      </div>
+
+      <button class="btn" onclick="login()">
+        Login
+      </button>
+
+      <div class="forgot">
+        <a onclick="openPopup()">Lupa Password?</a>
+      </div>
+
+      <div class="message error" id="errorMsg">
+        ID atau Password salah!
+      </div>
+
+    </div>
+
+  </div>
+
+ <!-- GANTI BAGIAN POPUP LUPA PASSWORD DENGAN INI -->
+
+<!-- POPUP LUPA PASSWORD -->
+<div class="popup" id="popup">
+
+  <div class="popup-box">
+
+    <h3>🔐 Verifikasi PIN</h3>
+
+    <div class="input-box">
+      <label>Masukkan PIN</label>
+      <input type="password" id="pinInput" placeholder="Masukkan PIN">
+    </div>
+
+    <button class="btn" onclick="checkPin()">
+      Lihat Password
+    </button>
+
+    <!-- PASSWORD LAMA -->
+    <div class="message success" id="passwordResult">
+      Password lama anda: <b>12345</b>
+    </div>
+
+    <!-- ERROR -->
+    <div class="message error" id="pinError">
+      PIN salah!
+    </div>
+
+    <button class="btn close" onclick="closePopup()">
+      Tutup
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+  // BUKA POPUP
+  function openPopup(){
+
+    document.getElementById("popup").style.display = "flex";
+
+    // reset tampilan
+    document.getElementById("passwordResult").style.display = "none";
+    document.getElementById("pinError").style.display = "none";
+
+  }
+
+  // TUTUP POPUP
+  function closePopup(){
+
+    document.getElementById("popup").style.display = "none";
+
+  }
+
+  // CEK PIN
+  function checkPin(){
+
+    let pin = document.getElementById("pinInput").value;
+
+    // PIN VALID
+    if(pin === "213121"){
+
+      document.getElementById("passwordResult").style.display = "block";
+      document.getElementById("pinError").style.display = "none";
+
+    }else{
+
+      document.getElementById("pinError").style.display = "block";
+      document.getElementById("passwordResult").style.display = "none";
+
+    }
+
+  }
+
+</script>
+
+    </div>
+
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+
+    <div class="header">
+      <h1>📹 CCTV Monitoring System</h1>
+
+      <button class="logout" onclick="logout()">
+        Logout
+      </button>
+    </div>
+
+    <div class="cams">
+
+      <div class="cam">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop">
+
+        <div class="cam-info">
+          CAM 01 - LOBBY <span class="rec">● REC</span>
+        </div>
+
+        <div class="time" id="time1"></div>
+      </div>
+
+      <div class="cam">
+        <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop">
+
+        <div class="cam-info">
+          CAM 02 - PARKING <span class="rec">● REC</span>
+        </div>
+
+        <div class="time" id="time2"></div>
+      </div>
+
+      <div class="cam">
+        <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1200&auto=format&fit=crop">
+
+        <div class="cam-info">
+          CAM 03 - WAREHOUSE <span class="rec">● REC</span>
+        </div>
+
+        <div class="time" id="time3"></div>
+      </div>
+
+      <div class="cam">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop">
+
+        <div class="cam-info">
+          CAM 04 - ENTRANCE <span class="rec">● REC</span>
+        </div>
+
+        <div class="time" id="time4"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // LOGIN
+    function login(){
+
+      let user = document.getElementById("username").value;
+      let pass = document.getElementById("password").value;
+
+      if(user === "admin" && pass === "12345"){
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+
+      }else{
+
+        document.getElementById("errorMsg").style.display = "block";
+
+      }
+
+    }
+
+    // LOGOUT
+    function logout(){
+
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginPage").style.display = "flex";
+
+    }
+
+    // POPUP
+    function openPopup(){
+
+      document.getElementById("popup").style.display = "flex";
+
+    }
+
+    function closePopup(){
+
+      document.getElementById("popup").style.display = "none";
+
+    }
+
+    // RESET PASSWORD
+    function sendReset(){
+
+      let email = document.getElementById("email").value;
+
+      if(email !== ""){
+
+        document.getElementById("successMsg").style.display = "block";
+
+      }
+
+    }
+
+    // CLOCK
+    function updateClock(){
+
+      let now = new Date();
+
+      let time =
+      now.toLocaleDateString("id-ID") +
+      " " +
+      now.toLocaleTimeString("id-ID");
+
+      document.getElementById("time1").innerHTML = time;
+      document.getElementById("time2").innerHTML = time;
+      document.getElementById("time3").innerHTML = time;
+      document.getElementById("time4").innerHTML = time;
+
+    }
+
+    setInterval(updateClock,1000);
+    updateClock();
+
+  </script>
+
+</body>
+</html>
